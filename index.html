@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sushil Choudhary — Motion Designer, Ahmedabad</title>
+<meta name="description" content="Motion designer working in brand films, cinematic, AI film, commercials and large-format animation. Based in Ahmedabad, India.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Latin:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<aside class="sidebar">
+  <div>
+    <h1 class="mark">
+      <span>Motion For</span>
+      <span>Bold Brands.</span>
+      <span class="dim">Sushil Choudhary.</span>
+    </h1>
+    <nav class="nav">
+      <a href="index.html" aria-current="page">Work</a>
+      <a href="profile.html">Profile</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+
+  <div class="meta">
+    <span class="live"><span class="dot"></span>Open for projects</span>
+    <span>Ahmedabad, India</span>
+    <span>Ten years in motion</span>
+  </div>
+</aside>
+
+<main class="main">
+  <p class="section-label">Selected disciplines — sound on</p>
+
+  <div class="work" id="work">
+    <a class="row" href="#" data-preview="Motion Graphics">
+      <span class="row-num">N'001</span>
+      <span class="row-title">Motion Graphics</span>
+      <span class="row-disc">2D Animation / Design</span>
+    </a>
+    <a class="row" href="#" data-preview="Brand Films">
+      <span class="row-num">N'002</span>
+      <span class="row-title">Brand Films</span>
+      <span class="row-disc">Story / Direction</span>
+    </a>
+    <a class="row" href="#" data-preview="Cinematic">
+      <span class="row-num">N'003</span>
+      <span class="row-title">Cinematic</span>
+      <span class="row-disc">Camera / Colour</span>
+    </a>
+    <a class="row" href="#" data-preview="AI Films">
+      <span class="row-num">N'004</span>
+      <span class="row-title">AI Films</span>
+      <span class="row-disc">Generative / Hybrid Workflow</span>
+    </a>
+    <a class="row" href="#" data-preview="Commercials">
+      <span class="row-num">N'005</span>
+      <span class="row-title">Commercials</span>
+      <span class="row-disc">Broadcast / Campaign</span>
+    </a>
+    <a class="row" href="#" data-preview="Explainers">
+      <span class="row-num">N'006</span>
+      <span class="row-title">Explainers</span>
+      <span class="row-disc">Product / Narrative</span>
+    </a>
+    <a class="row" href="#" data-preview="Billboard &amp; LED">
+      <span class="row-num">N'007</span>
+      <span class="row-title">Billboard &amp; LED</span>
+      <span class="row-disc">Large Format / Loop</span>
+    </a>
+    <a class="row" href="#" data-preview="Real Estate">
+      <span class="row-num">N'008</span>
+      <span class="row-title">Real Estate</span>
+      <span class="row-disc">Property Films / Walkthrough</span>
+    </a>
+    <a class="row" href="#" data-preview="Social Reels">
+      <span class="row-num">N'009</span>
+      <span class="row-title">Social Reels</span>
+      <span class="row-disc">Short Form / Vertical</span>
+    </a>
+    <a class="row" href="#" data-preview="Product Films">
+      <span class="row-num">N'010</span>
+      <span class="row-title">Product Films</span>
+      <span class="row-disc">Launch / UI Motion</span>
+    </a>
+    <a class="row" href="#" data-preview="Title Design">
+      <span class="row-num">N'011</span>
+      <span class="row-title">Title Design</span>
+      <span class="row-disc">Kinetic Typography</span>
+    </a>
+    <a class="row" href="#" data-preview="Showreel">
+      <span class="row-num">N'012</span>
+      <span class="row-title">Showreel</span>
+      <span class="row-disc">Selected Work / 2026</span>
+    </a>
+  </div>
+</main>
+
+<div class="preview" id="preview" aria-hidden="true"></div>
+
+<script>
+(function () {
+  var preview = document.getElementById('preview');
+  var rows = document.querySelectorAll('.row');
+  var x = 0, y = 0, cx = 0, cy = 0, raf = null;
+  var fine = window.matchMedia('(pointer: fine)').matches;
+  var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!fine) return;
+
+  function loop() {
+    cx += (x - cx) * 0.16;
+    cy += (y - cy) * 0.16;
+    preview.style.transform = 'translate(' + (cx + 24) + 'px,' + (cy - 68) + 'px)';
+    raf = requestAnimationFrame(loop);
+  }
+
+  document.addEventListener('mousemove', function (e) {
+    x = e.clientX; y = e.clientY;
+    if (still) {
+      preview.style.transform = 'translate(' + (x + 24) + 'px,' + (y - 68) + 'px)';
+    } else if (!raf) {
+      cx = x; cy = y; loop();
+    }
+  });
+
+  rows.forEach(function (row) {
+    row.addEventListener('mouseenter', function () {
+      preview.textContent = row.dataset.preview;
+      preview.classList.add('on');
+    });
+    row.addEventListener('mouseleave', function () {
+      preview.classList.remove('on');
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
