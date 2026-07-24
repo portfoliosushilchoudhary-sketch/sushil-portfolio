@@ -37,62 +37,62 @@
   <p class="section-label">Selected disciplines — sound on</p>
 
   <div class="work" id="work">
-    <a class="row" href="#" data-preview="Motion Graphics">
+    <a class="row" href="#" data-preview="Motion Graphics" data-video="assets/previews/motion-graphics.mp4">
       <span class="row-num">N'001</span>
       <span class="row-title">Motion Graphics</span>
       <span class="row-disc">2D Animation / Design</span>
     </a>
-    <a class="row" href="#" data-preview="Brand Films">
+    <a class="row" href="#" data-preview="Brand Films" data-video="assets/previews/brand-films.mp4">
       <span class="row-num">N'002</span>
       <span class="row-title">Brand Films</span>
       <span class="row-disc">Story / Direction</span>
     </a>
-    <a class="row" href="#" data-preview="Cinematic">
+    <a class="row" href="#" data-preview="Cinematic" data-video="assets/previews/cinematic.mp4">
       <span class="row-num">N'003</span>
       <span class="row-title">Cinematic</span>
       <span class="row-disc">Camera / Colour</span>
     </a>
-    <a class="row" href="#" data-preview="AI Films">
+    <a class="row" href="#" data-preview="AI Films" data-video="assets/previews/ai-films.mp4">
       <span class="row-num">N'004</span>
       <span class="row-title">AI Films</span>
       <span class="row-disc">Generative / Hybrid Workflow</span>
     </a>
-    <a class="row" href="#" data-preview="Commercials">
+    <a class="row" href="#" data-preview="Commercials" data-video="assets/previews/commercials.mp4">
       <span class="row-num">N'005</span>
       <span class="row-title">Commercials</span>
       <span class="row-disc">Broadcast / Campaign</span>
     </a>
-    <a class="row" href="#" data-preview="Explainers">
+    <a class="row" href="#" data-preview="Explainers" data-video="assets/previews/explainers.mp4">
       <span class="row-num">N'006</span>
       <span class="row-title">Explainers</span>
       <span class="row-disc">Product / Narrative</span>
     </a>
-    <a class="row" href="#" data-preview="Billboard &amp; LED">
+    <a class="row" href="#" data-preview="Billboard &amp; LED" data-video="assets/previews/billboard-led.mp4">
       <span class="row-num">N'007</span>
       <span class="row-title">Billboard &amp; LED</span>
       <span class="row-disc">Large Format / Loop</span>
     </a>
-    <a class="row" href="#" data-preview="Real Estate">
+    <a class="row" href="#" data-preview="Real Estate" data-video="assets/previews/real-estate.mp4">
       <span class="row-num">N'008</span>
       <span class="row-title">Real Estate</span>
       <span class="row-disc">Property Films / Walkthrough</span>
     </a>
-    <a class="row" href="#" data-preview="Social Reels">
+    <a class="row" href="#" data-preview="Social Reels" data-video="assets/previews/social-reels.mp4">
       <span class="row-num">N'009</span>
       <span class="row-title">Social Reels</span>
       <span class="row-disc">Short Form / Vertical</span>
     </a>
-    <a class="row" href="#" data-preview="Product Films">
+    <a class="row" href="#" data-preview="Product Films" data-video="assets/previews/product-films.mp4">
       <span class="row-num">N'010</span>
       <span class="row-title">Product Films</span>
       <span class="row-disc">Launch / UI Motion</span>
     </a>
-    <a class="row" href="#" data-preview="Title Design">
+    <a class="row" href="#" data-preview="Title Design" data-video="assets/previews/title-design.mp4">
       <span class="row-num">N'011</span>
       <span class="row-title">Title Design</span>
       <span class="row-disc">Kinetic Typography</span>
     </a>
-    <a class="row" href="#" data-preview="Showreel">
+    <a class="row" href="#" data-preview="Showreel" data-video="assets/previews/showreel.mp4">
       <span class="row-num">N'012</span>
       <span class="row-title">Showreel</span>
       <span class="row-disc">Selected Work / 2026</span>
@@ -100,11 +100,16 @@
   </div>
 </main>
 
-<div class="preview" id="preview" aria-hidden="true"></div>
+<div class="preview" id="preview" aria-hidden="true">
+  <video class="preview-video" muted loop playsinline preload="none"></video>
+  <span class="preview-label"></span>
+</div>
 
 <script>
 (function () {
   var preview = document.getElementById('preview');
+  var video = preview.querySelector('.preview-video');
+  var label = preview.querySelector('.preview-label');
   var rows = document.querySelectorAll('.row');
   var x = 0, y = 0, cx = 0, cy = 0, raf = null;
   var fine = window.matchMedia('(pointer: fine)').matches;
@@ -128,13 +133,29 @@
     }
   });
 
+  video.addEventListener('loadeddata', function () {
+    preview.classList.add('has-video');
+  });
+  video.addEventListener('error', function () {
+    preview.classList.remove('has-video');
+  });
+
   rows.forEach(function (row) {
     row.addEventListener('mouseenter', function () {
-      preview.textContent = row.dataset.preview;
+      label.textContent = row.dataset.preview;
+      preview.classList.remove('has-video');
+      if (row.dataset.video && !still) {
+        video.src = row.dataset.video;
+        video.play().catch(function () {});
+      }
       preview.classList.add('on');
     });
     row.addEventListener('mouseleave', function () {
       preview.classList.remove('on');
+      preview.classList.remove('has-video');
+      video.pause();
+      video.removeAttribute('src');
+      video.load();
     });
   });
 })();

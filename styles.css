@@ -212,6 +212,19 @@ a { color: inherit; text-decoration: none; }
 
 .preview.on { opacity: 1; }
 
+.preview-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+}
+
+.preview.has-video .preview-video { opacity: 1; }
+.preview.has-video .preview-label { opacity: 0; }
+
 /* ——— Editorial pages ——————————————————————————— */
 
 .prose { max-width: 62ch; }
