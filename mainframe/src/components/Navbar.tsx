@@ -1,42 +1,58 @@
-import { useState } from 'react'
-
-const LINKS = ['Labs', 'Studio', 'Openings', 'Shop']
+import { useEffect, useState } from 'react'
+import { navLinks, site } from '../data/site'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  // The hero sits on a light video, the sections below on the dark field —
+  // flip the bar's ink so it stays legible across both.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > window.innerHeight - 90)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  const ink = scrolled ? 'text-paper' : 'text-ink'
+  const bar = scrolled ? 'bg-paper' : 'bg-ink'
 
   return (
     <>
-      <header className="fixed top-0 left-0 z-10 flex w-full flex-row items-center justify-between px-5 py-4 sm:px-8 sm:py-5">
-        <div className="flex flex-row items-center gap-3">
+      <header
+        className={`fixed top-0 left-0 z-10 flex w-full flex-row items-center justify-between px-5 py-4 transition-colors duration-500 sm:px-8 sm:py-5 ${
+          scrolled ? 'bg-field/80 backdrop-blur-sm' : ''
+        }`}
+      >
+        <a href="#top" className={`flex flex-row items-center gap-3 ${ink}`}>
           <span
-            className="text-[21px] tracking-tight text-black sm:text-[26px]"
-            style={{ fontFamily: 'var(--font-heading)' }}
+            className="text-[21px] tracking-tight sm:text-[26px]"
+            style={{ fontFamily: 'var(--font-heading)', fontWeight: 600 }}
           >
-            Mainframe&reg;
+            {site.name}
           </span>
           <span
-            className="text-[25px] text-black select-none sm:text-[30px]"
+            className="text-[25px] select-none sm:text-[30px]"
             style={{ letterSpacing: '-0.02em' }}
           >
             &#x2733;&#xFE0E;
           </span>
-        </div>
+        </a>
 
-        <nav className="hidden flex-row text-[23px] text-black md:flex">
-          {LINKS.map((link, i) => (
-            <span key={link}>
-              <a href="#" className="transition-opacity hover:opacity-60">
-                {link}
+        <nav className={`hidden flex-row text-[23px] md:flex ${ink}`}>
+          {navLinks.map((link, i) => (
+            <span key={link.label}>
+              <a href={link.href} className="transition-opacity hover:opacity-60">
+                {link.label}
               </a>
-              {i < LINKS.length - 1 && <span>,&nbsp;</span>}
+              {i < navLinks.length - 1 && <span>,&nbsp;</span>}
             </span>
           ))}
         </nav>
 
         <a
-          href="#"
-          className="hidden text-[23px] text-black underline underline-offset-2 transition-opacity hover:opacity-60 md:block"
+          href={`mailto:${site.email}`}
+          className={`hidden text-[23px] underline underline-offset-2 transition-opacity hover:opacity-60 md:block ${ink}`}
         >
           Get in touch
         </a>
@@ -44,46 +60,47 @@ export default function Navbar() {
         <button
           type="button"
           aria-label="Toggle menu"
+          aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
           className="flex flex-col gap-[5px] md:hidden"
         >
           <span
-            className={`h-[2px] w-6 bg-black transition-transform duration-300 ${
-              open ? 'translate-y-[7px] rotate-45' : ''
+            className={`h-[2px] w-6 transition-all duration-300 ${
+              open ? 'translate-y-[7px] rotate-45 bg-paper' : bar
             }`}
           />
           <span
-            className={`h-[2px] w-6 bg-black transition-opacity duration-300 ${
+            className={`h-[2px] w-6 transition-all duration-300 ${bar} ${
               open ? 'opacity-0' : 'opacity-100'
             }`}
           />
           <span
-            className={`h-[2px] w-6 bg-black transition-transform duration-300 ${
-              open ? '-translate-y-[7px] -rotate-45' : ''
+            className={`h-[2px] w-6 transition-all duration-300 ${
+              open ? '-translate-y-[7px] -rotate-45 bg-paper' : bar
             }`}
           />
         </button>
       </header>
 
       <div
-        className={`fixed inset-0 z-[9] flex flex-col justify-center gap-8 bg-white/95 px-8 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
+        className={`fixed inset-0 z-[9] flex flex-col justify-center gap-8 bg-ink/95 px-8 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
           open ? 'opacity-100' : 'opacity-0'
         }`}
         style={{ pointerEvents: open ? 'auto' : 'none' }}
       >
-        {LINKS.map((link) => (
+        {navLinks.map((link) => (
           <a
-            key={link}
-            href="#"
-            className="text-[32px] font-medium text-black"
+            key={link.label}
+            href={link.href}
+            className="text-[32px] font-medium text-paper"
             onClick={() => setOpen(false)}
           >
-            {link}
+            {link.label}
           </a>
         ))}
         <a
-          href="#"
-          className="text-[32px] font-medium text-black underline underline-offset-2"
+          href={`mailto:${site.email}`}
+          className="text-[32px] font-medium text-paper underline underline-offset-2"
           onClick={() => setOpen(false)}
         >
           Get in touch

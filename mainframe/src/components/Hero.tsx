@@ -1,17 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTypewriter } from '../hooks/useTypewriter'
-
-const TYPEWRITER_TEXT =
-  'Glad you stopped in. Good taste tends to find us. Now, what are we building?'
-
-const PILL_LABELS = [
-  'Pitch us an idea',
-  'Come work here',
-  'Send a brief hello',
-  'See how we operate',
-]
-
-const EMAIL = 'hello@mainframe.co'
+import { hero, site } from '../data/site'
 
 const pillBase =
   'inline-flex items-center justify-center rounded-full text-[13px] sm:text-[15px] px-4 sm:px-5 py-[0.3em] mx-[0.2em] mb-[0.4em] whitespace-nowrap transition-colors duration-200'
@@ -34,20 +23,30 @@ function CopyIcon() {
 }
 
 export default function Hero() {
-  const { displayed, done } = useTypewriter(TYPEWRITER_TEXT)
+  const { displayed, done } = useTypewriter(hero.typewriter)
   const [pillsVisible, setPillsVisible] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     const timeout = setTimeout(() => setPillsVisible(true), 400)
     return () => clearTimeout(timeout)
   }, [])
 
-  const copyEmail = () => {
-    navigator.clipboard.writeText(EMAIL)
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(site.email)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1600)
+    } catch {
+      /* clipboard unavailable — the address is on screen anyway */
+    }
   }
 
   return (
-    <section className="relative z-[1] flex h-screen flex-col justify-end overflow-hidden px-5 pb-12 sm:px-8 md:justify-center md:px-10 md:pb-0">
+    <section
+      id="top"
+      className="relative z-[1] flex h-screen flex-col justify-end overflow-hidden px-5 pb-12 sm:px-8 md:justify-center md:px-10 md:pb-0"
+    >
       <div className="relative z-10 max-w-xl">
         <p
           className="pointer-events-none mb-5 select-none sm:mb-6"
@@ -59,13 +58,13 @@ export default function Hero() {
             filter: 'blur(4px)',
           }}
         >
-          Hey there, meet A.R.I.A,
+          {hero.introLine1}
           <br />
-          Mainframe&apos;s Adaptive Response Interface Agent
+          {hero.introLine2}
         </p>
 
         <p
-          className="mb-5 min-h-[54px] text-black sm:mb-6"
+          className="mb-5 min-h-[54px] text-ink sm:mb-6"
           style={{
             fontSize: 'clamp(18px, 4vw, 26px)',
             lineHeight: 1.35,
@@ -74,7 +73,7 @@ export default function Hero() {
         >
           {displayed}
           {!done && (
-            <span className="animate-blink ml-[2px] inline-block h-[1.1em] w-[2px] bg-black align-middle" />
+            <span className="animate-blink ml-[2px] inline-block h-[1.1em] w-[2px] bg-ink align-middle" />
           )}
         </p>
 
@@ -86,23 +85,23 @@ export default function Hero() {
             transition: 'opacity 0.4s ease, transform 0.4s ease',
           }}
         >
-          {PILL_LABELS.map((label) => (
-            <button
-              key={label}
-              type="button"
-              className={`${pillBase} border border-black/10 bg-white text-black hover:bg-black hover:text-white`}
+          {hero.pills.map((pill) => (
+            <a
+              key={pill.label}
+              href={pill.href}
+              className={`${pillBase} border border-black/10 bg-white text-ink hover:bg-ink hover:text-paper`}
             >
-              {label}
-            </button>
+              {pill.label}
+            </a>
           ))}
           <button
             type="button"
             onClick={copyEmail}
-            className={`${pillBase} gap-2 border border-white bg-transparent text-white hover:bg-white hover:text-black sm:gap-3`}
+            className={`${pillBase} gap-2 border border-white bg-transparent text-white hover:bg-white hover:text-ink sm:gap-3`}
           >
             <span>
-              Reach us:{' '}
-              <span className="underline underline-offset-1">{EMAIL}</span>
+              {copied ? 'Copied — ' : 'Reach me: '}
+              <span className="underline underline-offset-1">{site.email}</span>
             </span>
             <CopyIcon />
           </button>

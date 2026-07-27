@@ -57,14 +57,18 @@ export default function BackgroundVideo() {
   }, [])
 
   return (
-    <video
-      ref={videoRef}
-      src={VIDEO_SRC}
-      muted
-      playsInline
-      preload="auto"
-      className="fixed inset-0 z-0 h-full w-full object-cover"
-      style={{ objectPosition: '70% center' }}
-    />
+    // The paper field underneath keeps the hero's dark type legible even if
+    // the video is slow, blocked, or unavailable.
+    <div className="fixed inset-0 z-0 bg-paper">
+      <video
+        ref={videoRef}
+        src={VIDEO_SRC}
+        muted
+        playsInline
+        preload="auto"
+        className="h-full w-full object-cover"
+        style={{ objectPosition: '70% center' }}
+      />
+    </div>
   )
 }
