@@ -31,7 +31,7 @@ export default function ProjectPage({ project }: { project: Project }) {
 
         <p className="nda">{nda.project}</p>
 
-        <p className="section-label mt-14">Selected clips — sound on</p>
+        <p className="section-label clips-label">Selected clips — sound on</p>
         <div className="clips">
           {[1, 2, 3].map((n) => (
             <figure key={n} className="m-0">

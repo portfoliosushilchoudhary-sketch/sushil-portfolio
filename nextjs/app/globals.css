@@ -7,12 +7,12 @@
   --color-field: rgb(24 22 19);
   --color-vermilion: rgb(193 68 38);
 
-  --font-sans: "Anek Latin", system-ui, sans-serif;
+  --font-sans: var(--font-anek), system-ui, sans-serif;
 }
 
 :root {
-  --font-heading: "Anek Latin", "Helvetica Neue", Arial, sans-serif;
-  --font-body: "Anek Latin", "Helvetica Neue", Arial, sans-serif;
+  --font-heading: var(--font-anek), "Helvetica Neue", Arial, sans-serif;
+  --font-body: var(--font-anek), "Helvetica Neue", Arial, sans-serif;
 
   --rule: rgba(243, 240, 233, 0.14);
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
