@@ -1,0 +1,1580 @@
+<style>
+  @font-face {
+    font-family: 'Anek Latin';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: block;
+    src: url(data:font/woff2;base64,__FONT_B64__) format('woff2');
+  }
+
+  :root {
+    --paper: #f3f0e9;
+    --ink: #161412;
+    --field: #181613;
+    --grey: #8c8479;
+    --vermilion: #c14426;
+
+    --rule-dark: rgba(243, 240, 233, 0.14);
+    --rule-light: rgba(22, 20, 18, 0.14);
+
+    --gutter: clamp(20px, 3.4vw, 48px);
+    --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+    --step-display: clamp(34px, 4.4vw, 60px);
+    --step-h2: clamp(30px, 3.4vw, 50px);
+    --step-row: clamp(26px, 3vw, 42px);
+    --step-lede: clamp(18px, 4vw, 26px);
+    --step-body: 17px;
+    --step-label: 13px;
+
+    color-scheme: dark;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: var(--field);
+    color: var(--paper);
+    font-family: 'Anek Latin', system-ui, sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    line-height: 1.35;
+    font-synthesis: none;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--vermilion);
+    outline-offset: 4px;
+  }
+
+  h1,
+  h2 {
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  /* ——— Scrub canvas — the hero's footage field ————————— */
+
+  #scrub {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    background: var(--paper);
+    display: block;
+  }
+
+  /* ——— Bar ————————————————————————————————————— */
+
+  .bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 18px var(--gutter);
+    color: var(--ink);
+    transition: color 0.5s var(--ease), background-color 0.5s var(--ease);
+  }
+
+  .bar.over-field {
+    color: var(--paper);
+    background: rgba(24, 22, 19, 0.82);
+    backdrop-filter: blur(6px);
+  }
+
+  .wordmark {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: clamp(19px, 2vw, 24px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .wordmark .star {
+    font-size: 1.2em;
+    line-height: 0;
+    user-select: none;
+  }
+
+  .bar nav {
+    display: flex;
+    gap: 4px;
+    font-size: var(--step-label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .bar nav a,
+  .bar .cta {
+    transition: opacity 0.25s var(--ease);
+  }
+
+  .bar nav a:hover,
+  .bar .cta:hover {
+    opacity: 0.55;
+  }
+
+  .bar .cta {
+    font-size: var(--step-label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .burger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: 0;
+    padding: 4px;
+    cursor: pointer;
+  }
+
+  .burger span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: currentColor;
+    transition: transform 0.3s var(--ease), opacity 0.3s var(--ease);
+  }
+
+  .burger[aria-expanded='true'] span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .burger[aria-expanded='true'] span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .burger[aria-expanded='true'] span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  .sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 9;
+    background: rgba(22, 20, 18, 0.97);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 28px;
+    padding: 0 var(--gutter);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s var(--ease);
+  }
+
+  .sheet.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .sheet a {
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--paper);
+  }
+
+  /* ——— Hero ———————————————————————————————————— */
+
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 var(--gutter) 56px;
+    color: var(--ink);
+  }
+
+  @media (min-width: 768px) {
+    .hero {
+      justify-content: center;
+      padding-bottom: 0;
+    }
+  }
+
+  .hero-inner {
+    max-width: 34rem;
+  }
+
+  .hero-intro {
+    font-size: var(--step-lede);
+    font-weight: 400;
+    line-height: 1.3;
+    margin: 0 0 22px;
+    filter: blur(4px);
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .hero-line {
+    font-size: var(--step-lede);
+    font-weight: 400;
+    line-height: 1.35;
+    min-height: 2.6em;
+    margin: 0 0 22px;
+  }
+
+  .caret {
+    display: inline-block;
+    width: 2px;
+    height: 1.1em;
+    background: var(--ink);
+    vertical-align: middle;
+    margin-left: 3px;
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+  }
+
+  .pills.in {
+    opacity: 1;
+    transform: none;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 999px;
+    padding: 7px 18px;
+    font-size: 14px;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    cursor: pointer;
+    background: var(--paper);
+    color: var(--ink);
+    border: 1px solid var(--rule-light);
+    transition: background-color 0.25s var(--ease), color 0.25s var(--ease);
+  }
+
+  .pill:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .pill--ghost {
+    background: transparent;
+    border-color: rgba(22, 20, 18, 0.45);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pill--ghost:hover {
+    background: var(--vermilion);
+    border-color: var(--vermilion);
+    color: var(--paper);
+  }
+
+  .pill--ghost u {
+    text-underline-offset: 2px;
+  }
+
+  .pill svg {
+    flex: none;
+  }
+
+  /* Timecode HUD — reads out the scrub position */
+  .hud {
+    position: absolute;
+    right: var(--gutter);
+    bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(22, 20, 18, 0.5);
+    font-variant-numeric: tabular-nums;
+    user-select: none;
+    pointer-events: none;
+    transition: opacity 0.2s linear;
+  }
+
+  .hud .tc {
+    color: var(--ink);
+  }
+
+  @media (max-width: 767px) {
+    .hud {
+      display: none;
+    }
+  }
+
+  /* ——— Field (dark act) ————————————————————————— */
+
+  .field {
+    position: relative;
+    z-index: 2;
+    background: var(--field);
+    padding: 0 var(--gutter);
+  }
+
+  .field::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  section[id] {
+    scroll-margin-top: 84px;
+  }
+
+  /* first act of the dark field: land flush so no hero edge shows
+     under the bar — its own 96px of padding clears the type */
+  #work {
+    scroll-margin-top: 0;
+  }
+
+  .act {
+    position: relative;
+    z-index: 1;
+    padding: 96px 0;
+  }
+
+  .act + .act {
+    padding-top: 0;
+  }
+
+  .label {
+    font-size: var(--step-label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin: 0 0 28px;
+  }
+
+  /* ——— Discipline list ————————————————————————— */
+
+  .list {
+    border-top: 1px solid var(--rule-dark);
+  }
+
+  .row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 74px 1fr auto;
+    align-items: center;
+    gap: 16px;
+    padding: 26px 20px 26px 0;
+    border-bottom: 1px solid var(--rule-dark);
+    overflow: hidden;
+    isolation: isolate;
+    transition: padding-left 0.45s var(--ease);
+  }
+
+  .row::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--vermilion);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s var(--ease);
+    z-index: -1;
+  }
+
+  .row:hover,
+  .row:focus-visible {
+    padding-left: 20px;
+  }
+
+  .row:hover::before,
+  .row:focus-visible::before {
+    transform: scaleX(1);
+  }
+
+  .row-num {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--grey);
+    font-variant-numeric: tabular-nums;
+    transition: color 0.3s var(--ease);
+  }
+
+  .row-title {
+    font-size: var(--step-row);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+
+  .row-disc {
+    font-size: var(--step-label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--grey);
+    text-align: right;
+    transition: color 0.3s var(--ease);
+  }
+
+  .row:hover .row-num,
+  .row:hover .row-disc,
+  .row:focus-visible .row-num,
+  .row:focus-visible .row-disc {
+    color: rgba(243, 240, 233, 0.78);
+  }
+
+  .peek {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 240px;
+    height: 135px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--rule-dark);
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 5;
+    transition: opacity 0.3s var(--ease);
+    will-change: transform;
+  }
+
+  .peek.on {
+    opacity: 1;
+  }
+
+  /* ——— Editorial ————————————————————————————— */
+
+  .prose {
+    max-width: 62ch;
+  }
+
+  .prose h2 {
+    font-size: var(--step-h2);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin: 0 0 32px;
+  }
+
+  .prose p {
+    font-size: var(--step-body);
+    line-height: 1.6;
+    color: rgba(243, 240, 233, 0.82);
+    margin: 0 0 20px;
+  }
+
+  .prose p.lede {
+    color: var(--paper);
+    font-size: 19px;
+  }
+
+  .facts {
+    list-style: none;
+    margin: 56px 0 0;
+    padding: 0;
+    border-top: 1px solid var(--rule-dark);
+    max-width: 62ch;
+  }
+
+  .facts li {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--rule-dark);
+    font-size: 14px;
+  }
+
+  .facts .k {
+    color: var(--grey);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: var(--step-label);
+  }
+
+  .channels {
+    list-style: none;
+    margin: 44px 0 0;
+    padding: 0;
+    border-top: 1px solid var(--rule-dark);
+  }
+
+  .channels li {
+    border-bottom: 1px solid var(--rule-dark);
+  }
+
+  .channels a {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 22px 0;
+    transition: color 0.3s var(--ease), padding-left 0.4s var(--ease);
+  }
+
+  .channels a:hover {
+    color: var(--vermilion);
+    padding-left: 12px;
+  }
+
+  .channels .k {
+    font-size: var(--step-label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+
+  .channels .v {
+    font-size: clamp(20px, 2.2vw, 30px);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  /* ——— Colophon ————————————————————————————— */
+
+  .colophon {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding: 56px 0;
+    border-top: 1px solid var(--rule-dark);
+  }
+
+  @media (min-width: 768px) {
+    .colophon {
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+  }
+
+  .mark {
+    font-size: var(--step-display);
+    font-weight: 600;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+  }
+
+  .mark span {
+    display: block;
+  }
+
+  .mark .dim {
+    color: var(--grey);
+  }
+
+  .meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: var(--step-label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+
+  .meta .live {
+    color: var(--paper);
+  }
+
+  .dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--vermilion);
+    margin-right: 8px;
+    vertical-align: 1px;
+  }
+
+
+  /* ——— Project pages ————————————————————————— */
+
+  .back {
+    display: inline-block;
+    margin: 0 0 26px;
+    font-size: var(--step-label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--grey);
+    transition: color 0.25s var(--ease);
+  }
+
+  .back:hover {
+    color: var(--vermilion);
+  }
+
+  .nda {
+    max-width: 62ch;
+    margin: 44px 0 0;
+    padding: 18px 20px;
+    border-left: 2px solid var(--vermilion);
+    background: rgba(193, 68, 38, 0.08);
+    font-size: 14px;
+    line-height: 1.55;
+    color: rgba(243, 240, 233, 0.82);
+  }
+
+  .clips-label {
+    margin-top: 56px;
+  }
+
+  .clips {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+  .clip {
+    margin: 0;
+  }
+
+  .clip-video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    background: var(--ink);
+    border: 1px solid var(--rule-dark);
+  }
+
+  .clip-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    aspect-ratio: 16 / 9;
+    border: 1px dashed var(--rule-dark);
+    background: var(--ink);
+  }
+
+  .clip-tag {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+
+  .clip-note {
+    font-size: var(--step-label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(243, 240, 233, 0.6);
+  }
+
+  .clip-cap {
+    margin-top: 10px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+
+  .proj {
+    min-height: 100vh;
+    padding-top: 110px;
+  }
+
+  .proj[hidden],
+  .proj .act[hidden] {
+    display: none;
+  }
+
+  body.proj-open .hero,
+  body.proj-open .hud,
+  body.proj-open #scrub,
+  body.proj-open #home-field {
+    display: none;
+  }
+
+  @media (max-width: 900px) {
+
+    .bar nav,
+    .bar .cta {
+      display: none;
+    }
+    .burger {
+      display: flex;
+    }
+    .row {
+      grid-template-columns: 52px 1fr;
+      padding: 20px 0;
+    }
+    .row-disc {
+      grid-column: 2;
+      text-align: left;
+    }
+    .row:hover,
+    .row:focus-visible {
+      padding-left: 12px;
+    }
+    .peek {
+      display: none;
+    }
+    .act {
+      padding: 72px 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
+</style>
+
+<canvas id="scrub" aria-hidden="true"></canvas>
+
+<header class="bar" id="bar">
+  <a class="wordmark" href="#top">
+    Sushil Choudhary
+    <span class="star" aria-hidden="true">&#x2733;&#xFE0E;</span>
+  </a>
+  <nav>
+    <a href="#work">Work</a><span aria-hidden="true">,&nbsp;</span>
+    <a href="#profile">Profile</a><span aria-hidden="true">,&nbsp;</span>
+    <a href="#contact">Contact</a>
+  </nav>
+  <a class="cta" href="mailto:choudharysushil109@gmail.com">Get in touch</a>
+  <button class="burger" id="burger" type="button" aria-label="Menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<div class="sheet" id="sheet">
+  <a href="#work">Work</a>
+  <a href="#profile">Profile</a>
+  <a href="#contact">Contact</a>
+  <a href="mailto:choudharysushil109@gmail.com">Get in touch</a>
+</div>
+
+<section class="hero" id="top">
+  <div class="hero-inner">
+    <p class="hero-intro" aria-hidden="true">
+      Hey there, meet Sushil Choudhary,<br />
+      Motion designer, Ahmedabad — ten years of frames.
+    </p>
+    <h1 class="hero-line" id="line"></h1>
+    <div class="pills" id="pills">
+      <a class="pill" href="#work">See the work</a>
+      <a class="pill" href="#profile">Read the profile</a>
+      <a class="pill" href="#contact">Send a brief</a>
+      <button class="pill pill--ghost" id="copy" type="button">
+        <span id="copy-label">Reach me: <u>choudharysushil109@gmail.com</u></span>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
+          <rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1" />
+          <rect x="1" y="1" width="7.5" height="7.5" rx="1" />
+        </svg>
+      </button>
+    </div>
+  </div>
+  <div class="hud" aria-hidden="true">
+    <span>Scrub &#8596;</span>
+    <span class="tc" id="tc">00:00:00:00</span>
+  </div>
+</section>
+
+<div class="field" id="home-field">
+  <section class="act" id="work">
+    <p class="label">Selected disciplines — sound on</p>
+    <div class="list" id="list">
+      <a class="row" href="#p/motion-graphics"><span class="row-num">N'001</span><span class="row-title">Motion Graphics</span><span class="row-disc">2D Animation / Design</span></a>
+      <a class="row" href="#p/brand-films"><span class="row-num">N'002</span><span class="row-title">Brand Films</span><span class="row-disc">Story / Direction</span></a>
+      <a class="row" href="#p/cinematic"><span class="row-num">N'003</span><span class="row-title">Cinematic</span><span class="row-disc">Camera / Colour</span></a>
+      <a class="row" href="#p/ai-films"><span class="row-num">N'004</span><span class="row-title">AI Films</span><span class="row-disc">Generative / Hybrid Workflow</span></a>
+      <a class="row" href="#p/commercials"><span class="row-num">N'005</span><span class="row-title">Commercials</span><span class="row-disc">Broadcast / Campaign</span></a>
+      <a class="row" href="#p/explainers"><span class="row-num">N'006</span><span class="row-title">Explainers</span><span class="row-disc">Product / Narrative</span></a>
+      <a class="row" href="#p/billboard-led"><span class="row-num">N'007</span><span class="row-title">Billboard &amp; LED</span><span class="row-disc">Large Format / Loop</span></a>
+      <a class="row" href="#p/real-estate"><span class="row-num">N'008</span><span class="row-title">Real Estate</span><span class="row-disc">Property Films / Walkthrough</span></a>
+      <a class="row" href="#p/social-reels"><span class="row-num">N'009</span><span class="row-title">Social Reels</span><span class="row-disc">Short Form / Vertical</span></a>
+      <a class="row" href="#p/product-films"><span class="row-num">N'010</span><span class="row-title">Product Films</span><span class="row-disc">Launch / UI Motion</span></a>
+      <a class="row" href="#p/title-design"><span class="row-num">N'011</span><span class="row-title">Title Design</span><span class="row-disc">Kinetic Typography</span></a>
+      <a class="row" href="#p/showreel"><span class="row-num">N'012</span><span class="row-title">Showreel</span><span class="row-disc">Selected Work / 2026</span></a>
+    </div>
+    <p class="nda">Due to NDA restrictions, my best work and full-length films can&rsquo;t be published here &mdash; each discipline page carries cleared excerpts, and full case studies are available on request.</p>
+  </section>
+
+  <section class="act" id="profile">
+    <p class="label">Profile</p>
+    <div class="prose">
+      <h2>I make brands move.</h2>
+      <p class="lede">Ten years of frames — commercials, brand films, explainers, and animation big enough to read from across a road.</p>
+      <p>I work out of Ahmedabad, across the range a motion designer actually gets asked for: a festive campaign that has to feel like an occasion, a pharma explainer people finish watching, a property film that sells before the site visit, a billboard loop that lands in three seconds at forty kilometres an hour.</p>
+      <p>Lately that includes AI film — not as a novelty, but as another camera. Generative passes for plates and texture, hand-cut where the timing matters. The tools changed; the edit didn&rsquo;t.</p>
+      <p>I care about timing more than trends. A cut landing on the right beat does more than any effect, and most work that feels expensive is really just work that was paced properly.</p>
+    </div>
+    <ul class="facts">
+      <li><span class="k">Based</span><span>Ahmedabad, Gujarat</span></li>
+      <li><span class="k">Practising since</span><span>2016</span></li>
+      <li><span class="k">Disciplines</span><span>Motion, film, edit, colour</span></li>
+      <li><span class="k">Tools</span><span>After Effects, Premiere, DaVinci, Blender</span></li>
+      <li><span class="k">Languages</span><span>English, Hindi, Gujarati</span></li>
+      <li><span class="k">Availability</span><span>Freelance &amp; retainer</span></li>
+    </ul>
+  </section>
+
+  <section class="act" id="contact">
+    <p class="label">Contact</p>
+    <div class="prose">
+      <h2>Got something that should move?</h2>
+      <p class="lede">Send the brief, the deadline and the budget. You&rsquo;ll hear back within a day, and honestly if I&rsquo;m not the right person for it.</p>
+    </div>
+    <ul class="channels">
+      <li><a href="mailto:choudharysushil109@gmail.com"><span class="k">Email</span><span class="v">choudharysushil109@gmail.com</span></a></li>
+      <li><a href="tel:+919514128857"><span class="k">Phone</span><span class="v">+91 95141 28857</span></a></li>
+      <li><a href="https://instagram.com/wanderingsushx" target="_blank" rel="noopener"><span class="k">Instagram</span><span class="v">@wanderingsushx</span></a></li>
+      <li><a href="https://maps.google.com/?q=Ahmedabad" target="_blank" rel="noopener"><span class="k">Studio</span><span class="v">Ahmedabad, Gujarat</span></a></li>
+    </ul>
+  </section>
+
+  <footer class="colophon">
+    <h2 class="mark">
+      <span>Motion For</span>
+      <span>Bold Brands.</span>
+      <span class="dim">Sushil Choudhary.</span>
+    </h2>
+    <div class="meta">
+      <span class="live"><span class="dot"></span>Open for projects</span>
+      <span>Ahmedabad, India</span>
+      <span>Ten years in motion</span>
+      <span id="year">&copy; 2026</span>
+    </div>
+  </footer>
+</div>
+
+<div class="field proj" id="proj" hidden>
+  <section class="act" id="p-motion-graphics" hidden>
+    <a class="back" href="#work">&#8592; All work</a>
+    <p class="label">N'001 &mdash; 2D Animation / Design</p>
+    <div class="prose">
+      <h2>Motion Graphics</h2>
+      <p class="lede">Graphic systems in motion — logo behaviour, kinetic layouts and animated identity work built frame by frame.</p>
+      <p>From animated brand systems to broadcast packages, this is where design meets timing. Every piece starts on the grid and earns its movement — easing, rhythm and hierarchy doing the storytelling.</p>
+    </div>
+    <p class="nda">Due to NDA restrictions, I can&rsquo;t share my best work or full-length films here &mdash; the clips below are cleared excerpts. Full case studies are available on request over a call.</p>
+    <p class="label clips-label">Selected clips &mdash; sound on</p>
+    <div class="clips">
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'001 / Clip 01</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Motion Graphics &mdash; excerpt 01</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'001 / Clip 02</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Motion Graphics &mdash; excerpt 02</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'001 / Clip 03</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Motion Graphics &mdash; excerpt 03</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="act" id="p-brand-films" hidden>
+    <a class="back" href="#work">&#8592; All work</a>
+    <p class="label">N'002 &mdash; Story / Direction</p>
+    <div class="prose">
+      <h2>Brand Films</h2>
+      <p class="lede">Films that carry a brand's voice — story-first pieces directed from script to final grade.</p>
+      <p>A brand film has one job: make people feel something specific about a company. I direct these end to end — narrative structure, boards, shoot supervision or full animation, edit and sound.</p>
+    </div>
+    <p class="nda">Due to NDA restrictions, I can&rsquo;t share my best work or full-length films here &mdash; the clips below are cleared excerpts. Full case studies are available on request over a call.</p>
+    <p class="label clips-label">Selected clips &mdash; sound on</p>
+    <div class="clips">
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'002 / Clip 01</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Brand Films &mdash; excerpt 01</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'002 / Clip 02</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Brand Films &mdash; excerpt 02</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'002 / Clip 03</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Brand Films &mdash; excerpt 03</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="act" id="p-cinematic" hidden>
+    <a class="back" href="#work">&#8592; All work</a>
+    <p class="label">N'003 &mdash; Camera / Colour</p>
+    <div class="prose">
+      <h2>Cinematic</h2>
+      <p class="lede">Camera-driven work where light, lens language and colour grading do the heavy lifting.</p>
+      <p>Virtual cinematography, simulated optics and a disciplined grade. These pieces borrow the grammar of film — blocking, coverage, contrast ratios — and apply it to motion design.</p>
+    </div>
+    <p class="nda">Due to NDA restrictions, I can&rsquo;t share my best work or full-length films here &mdash; the clips below are cleared excerpts. Full case studies are available on request over a call.</p>
+    <p class="label clips-label">Selected clips &mdash; sound on</p>
+    <div class="clips">
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'003 / Clip 01</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Cinematic &mdash; excerpt 01</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'003 / Clip 02</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Cinematic &mdash; excerpt 02</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'003 / Clip 03</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Cinematic &mdash; excerpt 03</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="act" id="p-ai-films" hidden>
+    <a class="back" href="#work">&#8592; All work</a>
+    <p class="label">N'004 &mdash; Generative / Hybrid Workflow</p>
+    <div class="prose">
+      <h2>AI Films</h2>
+      <p class="lede">Hybrid pipelines that pair generative tools with hands-on direction, compositing and grade.</p>
+      <p>Generative models are a new camera, not a finished film. I use them inside a traditional pipeline — art direction up front, heavy curation, then compositing, retiming and grading to bring the output up to commercial standard.</p>
+    </div>
+    <p class="nda">Due to NDA restrictions, I can&rsquo;t share my best work or full-length films here &mdash; the clips below are cleared excerpts. Full case studies are available on request over a call.</p>
+    <p class="label clips-label">Selected clips &mdash; sound on</p>
+    <div class="clips">
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'004 / Clip 01</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">AI Films &mdash; excerpt 01</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'004 / Clip 02</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">AI Films &mdash; excerpt 02</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'004 / Clip 03</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">AI Films &mdash; excerpt 03</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="act" id="p-commercials" hidden>
+    <a class="back" href="#work">&#8592; All work</a>
+    <p class="label">N'005 &mdash; Broadcast / Campaign</p>
+    <div class="prose">
+      <h2>Commercials</h2>
+      <p class="lede">Broadcast and campaign spots — tight durations, hard deadlines, messages that land in seconds.</p>
+      <p>Thirty seconds is a long time if every frame is working. Campaign work across broadcast and digital: concept, boards, animation and versioning for every placement a media plan demands.</p>
+    </div>
+    <p class="nda">Due to NDA restrictions, I can&rsquo;t share my best work or full-length films here &mdash; the clips below are cleared excerpts. Full case studies are available on request over a call.</p>
+    <p class="label clips-label">Selected clips &mdash; sound on</p>
+    <div class="clips">
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'005 / Clip 01</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Commercials &mdash; excerpt 01</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'005 / Clip 02</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Commercials &mdash; excerpt 02</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'005 / Clip 03</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Commercials &mdash; excerpt 03</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="act" id="p-explainers" hidden>
+    <a class="back" href="#work">&#8592; All work</a>
+    <p class="label">N'006 &mdash; Product / Narrative</p>
+    <div class="prose">
+      <h2>Explainers</h2>
+      <p class="lede">Product and narrative explainers that turn complicated ideas into sequences people actually follow.</p>
+      <p>The craft here is compression — taking a dense product or process and finding the visual sentence that explains it. Script, voice, illustration and animation built as one system.</p>
+    </div>
+    <p class="nda">Due to NDA restrictions, I can&rsquo;t share my best work or full-length films here &mdash; the clips below are cleared excerpts. Full case studies are available on request over a call.</p>
+    <p class="label clips-label">Selected clips &mdash; sound on</p>
+    <div class="clips">
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'006 / Clip 01</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Explainers &mdash; excerpt 01</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'006 / Clip 02</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Explainers &mdash; excerpt 02</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'006 / Clip 03</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Explainers &mdash; excerpt 03</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="act" id="p-billboard-led" hidden>
+    <a class="back" href="#work">&#8592; All work</a>
+    <p class="label">N'007 &mdash; Large Format / Loop</p>
+    <div class="prose">
+      <h2>Billboard &amp; LED</h2>
+      <p class="lede">Large-format and LED work — seamless loops built for scale, distance and unusual canvases.</p>
+      <p>Designing for a screen the size of a building changes everything: legibility at distance, loop points nobody can spot, pixel maps that are never 16:9. Work delivered for outdoor LED, retail walls and event screens.</p>
+    </div>
+    <p class="nda">Due to NDA restrictions, I can&rsquo;t share my best work or full-length films here &mdash; the clips below are cleared excerpts. Full case studies are available on request over a call.</p>
+    <p class="label clips-label">Selected clips &mdash; sound on</p>
+    <div class="clips">
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'007 / Clip 01</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Billboard &amp; LED &mdash; excerpt 01</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'007 / Clip 02</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Billboard &amp; LED &mdash; excerpt 02</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'007 / Clip 03</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Billboard &amp; LED &mdash; excerpt 03</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="act" id="p-real-estate" hidden>
+    <a class="back" href="#work">&#8592; All work</a>
+    <p class="label">N'008 &mdash; Property Films / Walkthrough</p>
+    <div class="prose">
+      <h2>Real Estate</h2>
+      <p class="lede">Property films and walkthroughs that sell a space before it exists.</p>
+      <p>Architectural film work — walkthroughs, aerial-style reveals and lifestyle cutdowns that give a development atmosphere, not just square footage.</p>
+    </div>
+    <p class="nda">Due to NDA restrictions, I can&rsquo;t share my best work or full-length films here &mdash; the clips below are cleared excerpts. Full case studies are available on request over a call.</p>
+    <p class="label clips-label">Selected clips &mdash; sound on</p>
+    <div class="clips">
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'008 / Clip 01</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Real Estate &mdash; excerpt 01</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'008 / Clip 02</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Real Estate &mdash; excerpt 02</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'008 / Clip 03</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Real Estate &mdash; excerpt 03</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="act" id="p-social-reels" hidden>
+    <a class="back" href="#work">&#8592; All work</a>
+    <p class="label">N'009 &mdash; Short Form / Vertical</p>
+    <div class="prose">
+      <h2>Social Reels</h2>
+      <p class="lede">Short-form vertical work engineered for the first second — hooks, pace and platform-native motion.</p>
+      <p>Vertical is its own discipline. These pieces are cut for sound-off first viewing, built around a hook in the opening beat, and designed to survive compression and a thumb mid-scroll.</p>
+    </div>
+    <p class="nda">Due to NDA restrictions, I can&rsquo;t share my best work or full-length films here &mdash; the clips below are cleared excerpts. Full case studies are available on request over a call.</p>
+    <p class="label clips-label">Selected clips &mdash; sound on</p>
+    <div class="clips">
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'009 / Clip 01</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Social Reels &mdash; excerpt 01</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'009 / Clip 02</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Social Reels &mdash; excerpt 02</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'009 / Clip 03</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Social Reels &mdash; excerpt 03</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="act" id="p-product-films" hidden>
+    <a class="back" href="#work">&#8592; All work</a>
+    <p class="label">N'010 &mdash; Launch / UI Motion</p>
+    <div class="prose">
+      <h2>Product Films</h2>
+      <p class="lede">Launch films and UI motion — devices, interfaces and features presented with precision.</p>
+      <p>Product work rewards restraint: clean staging, honest materials, interface motion that mirrors how the real product feels. Launch films, feature explainers and store assets.</p>
+    </div>
+    <p class="nda">Due to NDA restrictions, I can&rsquo;t share my best work or full-length films here &mdash; the clips below are cleared excerpts. Full case studies are available on request over a call.</p>
+    <p class="label clips-label">Selected clips &mdash; sound on</p>
+    <div class="clips">
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'010 / Clip 01</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Product Films &mdash; excerpt 01</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'010 / Clip 02</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Product Films &mdash; excerpt 02</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'010 / Clip 03</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Product Films &mdash; excerpt 03</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="act" id="p-title-design" hidden>
+    <a class="back" href="#work">&#8592; All work</a>
+    <p class="label">N'011 &mdash; Kinetic Typography</p>
+    <div class="prose">
+      <h2>Title Design</h2>
+      <p class="lede">Kinetic typography and title sequences — type as the lead performer.</p>
+      <p>Titles set the contract with the audience. Kinetic type pieces, opening sequences and typographic idents where letterforms carry rhythm, tone and story on their own.</p>
+    </div>
+    <p class="nda">Due to NDA restrictions, I can&rsquo;t share my best work or full-length films here &mdash; the clips below are cleared excerpts. Full case studies are available on request over a call.</p>
+    <p class="label clips-label">Selected clips &mdash; sound on</p>
+    <div class="clips">
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'011 / Clip 01</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Title Design &mdash; excerpt 01</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'011 / Clip 02</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Title Design &mdash; excerpt 02</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'011 / Clip 03</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Title Design &mdash; excerpt 03</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="act" id="p-showreel" hidden>
+    <a class="back" href="#work">&#8592; All work</a>
+    <p class="label">N'012 &mdash; Selected Work / 2026</p>
+    <div class="prose">
+      <h2>Showreel</h2>
+      <p class="lede">Selected work, cut together — a fast pass through the last stretch of projects.</p>
+      <p>A single cut of the strongest recent work across disciplines. Updated as new projects clear for release.</p>
+    </div>
+    <p class="nda">Due to NDA restrictions, I can&rsquo;t share my best work or full-length films here &mdash; the clips below are cleared excerpts. Full case studies are available on request over a call.</p>
+    <p class="label clips-label">Selected clips &mdash; sound on</p>
+    <div class="clips">
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'012 / Clip 01</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Showreel &mdash; excerpt 01</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'012 / Clip 02</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Showreel &mdash; excerpt 02</figcaption>
+      </figure>
+      <figure class="clip">
+        <div class="clip-empty">
+          <span class="clip-tag">N'012 / Clip 03</span>
+          <span class="clip-note">Video coming soon</span>
+        </div>
+        <figcaption class="clip-cap">Showreel &mdash; excerpt 03</figcaption>
+      </figure>
+    </div>
+  </section>
+</div>
+
+<div class="peek" id="peek" aria-hidden="true"></div>
+
+<script>
+  (function () {
+    'use strict';
+
+    var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var fine = window.matchMedia('(pointer: fine)').matches;
+
+    /* ——— Typewriter ——————————————————————————— */
+
+    var LINE = 'Glad you stopped in. I make brands move. Now, what are we building?';
+    var line = document.getElementById('line');
+    var caret = document.createElement('span');
+    caret.className = 'caret';
+
+    if (still) {
+      line.textContent = LINE;
+    } else {
+      var i = 0;
+      line.appendChild(document.createTextNode(''));
+      line.appendChild(caret);
+      setTimeout(function () {
+        var tick = setInterval(function () {
+          i += 1;
+          line.firstChild.nodeValue = LINE.slice(0, i);
+          if (i >= LINE.length) {
+            clearInterval(tick);
+            caret.remove();
+          }
+        }, 38);
+      }, 600);
+    }
+
+    setTimeout(function () {
+      document.getElementById('pills').classList.add('in');
+    }, 400);
+
+    /* ——— Copy the address ————————————————————— */
+
+    var copy = document.getElementById('copy');
+    var copyLabel = document.getElementById('copy-label');
+    var copyHTML = copyLabel.innerHTML;
+    copy.addEventListener('click', function () {
+      var done = function () {
+        copyLabel.textContent = 'Copied to clipboard';
+        setTimeout(function () {
+          copyLabel.innerHTML = copyHTML;
+        }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText('choudharysushil109@gmail.com').then(done, function () {});
+      }
+    });
+
+    /* ——— Bar flips ink once it leaves the hero ————— */
+
+    var bar = document.getElementById('bar');
+    var fieldEl = document.querySelector('.field');
+    var hud = document.querySelector('.hud');
+    var onScroll = function () {
+      /* a project view is all dark field — the bar stays flipped */
+      if (document.body.classList.contains('proj-open')) {
+        bar.classList.add('over-field');
+        hud.style.opacity = 0;
+        return;
+      }
+      /* measure the dark act rather than guessing at viewport height */
+      bar.classList.toggle('over-field', window.scrollY + 84 >= fieldEl.offsetTop);
+      /* retire the timecode as the hero leaves, so it never meets the bar */
+      var fade = 1 - Math.min(1, window.scrollY / (window.innerHeight * 0.6));
+      hud.style.opacity = fade.toFixed(2);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    /* ——— Mobile sheet ————————————————————————— */
+
+    var burger = document.getElementById('burger');
+    var sheet = document.getElementById('sheet');
+    burger.addEventListener('click', function () {
+      var open = sheet.classList.toggle('open');
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    sheet.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A') {
+        sheet.classList.remove('open');
+        burger.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    /* ——— Project views — #p/<slug> ———————————————— */
+
+    var proj = document.getElementById('proj');
+    var projViews = proj.querySelectorAll('.act');
+    var route = function () {
+      var m = location.hash.match(/^#p\/([a-z-]+)$/);
+      var open = m && document.getElementById('p-' + m[1]);
+      if (open) {
+        document.body.classList.add('proj-open');
+        proj.hidden = false;
+        Array.prototype.forEach.call(projViews, function (v) {
+          v.hidden = v.id !== 'p-' + m[1];
+        });
+        window.scrollTo(0, 0);
+      } else {
+        document.body.classList.remove('proj-open');
+        proj.hidden = true;
+        /* the anchor was hidden while the project view was up —
+           finish the jump by hand once the landing is back */
+        var t = location.hash && /^#[a-z]+$/.test(location.hash) &&
+          document.querySelector(location.hash);
+        if (t) t.scrollIntoView();
+      }
+      onScroll();
+    };
+    window.addEventListener('hashchange', route);
+    route();
+
+    /* ——— Cursor peek on the discipline rows ——————— */
+
+    var peek = document.getElementById('peek');
+    if (fine) {
+      var px = 0, py = 0, cx = 0, cy = 0, raf = null;
+      var place = function (x, y) {
+        peek.style.transform = 'translate(' + (x + 24) + 'px,' + (y - 68) + 'px)';
+      };
+      var chase = function () {
+        cx += (px - cx) * 0.16;
+        cy += (py - cy) * 0.16;
+        place(cx, cy);
+        raf = requestAnimationFrame(chase);
+      };
+      document.addEventListener('mousemove', function (e) {
+        px = e.clientX;
+        py = e.clientY;
+        if (still) {
+          place(px, py);
+        } else if (!raf) {
+          cx = px;
+          cy = py;
+          chase();
+        }
+      });
+      Array.prototype.forEach.call(document.querySelectorAll('.row'), function (row) {
+        var label = row.querySelector('.row-title').textContent;
+        row.addEventListener('mouseenter', function () {
+          peek.textContent = label;
+          peek.classList.add('on');
+        });
+        row.addEventListener('mouseleave', function () {
+          peek.classList.remove('on');
+        });
+      });
+    }
+
+    /* ——— The scrub field ————————————————————————
+       Horizontal mouse movement scrubs a strip of abstract footage,
+       the way you'd drag a playhead. Position drives the timecode. */
+
+    var canvas = document.getElementById('scrub');
+    var ctx = canvas.getContext('2d');
+    var tc = document.getElementById('tc');
+    var w = 0, h = 0;
+    var head = 0.18;   /* playhead, 0..1 */
+    var shown = 0.18;  /* eased value actually drawn */
+    var prevX = null;
+    var DURATION = 24; /* seconds of "footage" the strip represents */
+
+    var resize = function () {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    var band = function (y, height, t, hue) {
+      var g = ctx.createLinearGradient(0, y, w, y + height);
+      g.addColorStop(0, 'rgba(243,240,233,0)');
+      g.addColorStop(Math.max(0.02, Math.min(0.98, 0.5 + 0.42 * Math.sin(t))), hue);
+      g.addColorStop(1, 'rgba(243,240,233,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, y, w, height);
+    };
+
+    var draw = function () {
+      ctx.clearRect(0, 0, w, h);
+
+      var t = shown * Math.PI * 4;
+      var rows = 9;
+      var gap = h / rows;
+
+      for (var r = 0; r < rows; r++) {
+        var phase = t + r * 0.55;
+        var y = r * gap + Math.sin(phase * 0.7) * gap * 0.28;
+        var alpha = 0.07 + 0.08 * (1 + Math.sin(phase * 1.3)) / 2;
+        var warm = r % 4 === 1;
+        var hue = warm
+          ? 'rgba(193,68,38,' + (alpha * 0.85).toFixed(3) + ')'
+          : 'rgba(22,20,18,' + alpha.toFixed(3) + ')';
+        band(y, gap * 0.92, phase, hue);
+      }
+
+      /* playhead — a hairline that tracks the scrub */
+      var x = shown * w;
+      ctx.fillStyle = 'rgba(193,68,38,0.5)';
+      ctx.fillRect(x, 0, 1, h);
+
+      var frames = Math.floor(shown * DURATION * 24);
+      var ss = Math.floor(frames / 24);
+      var ff = frames % 24;
+      var pad = function (n) {
+        return (n < 10 ? '0' : '') + n;
+      };
+      tc.textContent = '00:00:' + pad(ss) + ':' + pad(ff);
+    };
+
+    var frame = function () {
+      shown += (head - shown) * 0.12;
+      draw();
+      requestAnimationFrame(frame);
+    };
+
+    window.addEventListener('resize', function () {
+      resize();
+      draw();
+    });
+
+    window.addEventListener('mousemove', function (e) {
+      if (prevX === null) {
+        prevX = e.clientX;
+        return;
+      }
+      var delta = e.clientX - prevX;
+      prevX = e.clientX;
+      head += (delta / window.innerWidth) * 0.8;
+      head = Math.max(0, Math.min(1, head));
+      if (still) {
+        shown = head;
+        draw();
+      }
+    });
+
+    /* touch: drag anywhere on the hero to scrub */
+    var prevT = null;
+    document.addEventListener('touchmove', function (e) {
+      var x = e.touches[0].clientX;
+      if (prevT !== null) {
+        head += ((x - prevT) / window.innerWidth) * 0.8;
+        head = Math.max(0, Math.min(1, head));
+        if (still) { shown = head; draw(); }
+      }
+      prevT = x;
+    }, { passive: true });
+    document.addEventListener('touchend', function () { prevT = null; });
+
+    resize();
+    if (still) {
+      shown = head;
+      draw();
+    } else {
+      frame();
+    }
+
+    document.getElementById('year').innerHTML = '&copy; ' + new Date().getFullYear();
+  })();
+</script>
