@@ -137,6 +137,22 @@ export const work = [
   },
 ]
 
+// Cleared excerpts per discipline. Files live in
+// public/projects/<slug>/<file>.mp4 (+ matching .jpg poster).
+// portrait: true renders a 9:16 tile for vertical reels.
+export type Clip = { file: string; portrait?: boolean }
+
+export const projectClips: Record<string, Clip[]> = {
+  'motion-graphics': [
+    { file: '01', portrait: true },
+    { file: '02' },
+    { file: '03', portrait: true },
+    { file: '04' },
+    { file: '05' },
+    { file: '06' },
+  ],
+}
+
 export const profile = {
   heading: 'I make brands move.',
   lead: 'Ten years of frames — commercials, brand films, explainers, and animation big enough to read from across a road.',

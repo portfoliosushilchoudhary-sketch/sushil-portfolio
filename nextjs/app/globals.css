@@ -297,6 +297,7 @@ section[id] {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 24px;
+  align-items: start;
 }
 
 .clip-video {
@@ -306,6 +307,13 @@ section[id] {
   object-fit: cover;
   background: var(--color-ink);
   border: 1px solid var(--rule);
+}
+
+/* Vertical reels keep their 9:16 frame instead of being cropped. */
+.clip-video--portrait {
+  aspect-ratio: 9 / 16;
+  max-height: 78vh;
+  object-fit: contain;
 }
 
 .clip-empty {

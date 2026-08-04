@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
-import { nda, site, work } from '@/lib/site'
+import { nda, projectClips, site, work } from '@/lib/site'
 
 type Params = Promise<{ slug: string }>
 
@@ -29,6 +29,8 @@ export default async function ProjectPage({ params }: { params: Params }) {
   const { slug } = await params
   const project = work.find((w) => w.slug === slug)
   if (!project) notFound()
+
+  const clips = projectClips[project.slug] ?? []
 
   return (
     <>
@@ -56,23 +58,37 @@ export default async function ProjectPage({ params }: { params: Params }) {
 
           <p className="section-label clips-label">Selected clips — sound on</p>
           <div className="clips">
-            {[1, 2, 3].map((n) => (
-              <figure key={n} className="m-0">
-                {/* When the video is ready, drop it in public/projects/<slug>/0N.mp4
-                    and replace .clip-empty with:
-                    <video className="clip-video" src={`/projects/${project.slug}/0${n}.mp4`}
-                           controls playsInline preload="metadata" /> */}
-                <div className="clip-empty">
-                  <span className="clip-tag">
-                    {project.num} / Clip 0{n}
-                  </span>
-                  <span className="clip-note">Video coming soon</span>
-                </div>
-                <figcaption className="clip-cap">
-                  {project.title} — excerpt 0{n}
-                </figcaption>
-              </figure>
-            ))}
+            {clips.length > 0
+              ? clips.map((clip) => (
+                  <figure key={clip.file} className="m-0">
+                    <video
+                      className={
+                        clip.portrait ? 'clip-video clip-video--portrait' : 'clip-video'
+                      }
+                      src={`/projects/${project.slug}/${clip.file}.mp4`}
+                      poster={`/projects/${project.slug}/${clip.file}.jpg`}
+                      controls
+                      playsInline
+                      preload="metadata"
+                    />
+                    <figcaption className="clip-cap">
+                      {project.title} — excerpt {clip.file}
+                    </figcaption>
+                  </figure>
+                ))
+              : [1, 2, 3].map((n) => (
+                  <figure key={n} className="m-0">
+                    <div className="clip-empty">
+                      <span className="clip-tag">
+                        {project.num} / Clip 0{n}
+                      </span>
+                      <span className="clip-note">Video coming soon</span>
+                    </div>
+                    <figcaption className="clip-cap">
+                      {project.title} — excerpt 0{n}
+                    </figcaption>
+                  </figure>
+                ))}
           </div>
         </div>
       </main>
