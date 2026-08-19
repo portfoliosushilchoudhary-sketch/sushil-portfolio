@@ -295,11 +295,23 @@ section[id] {
 
 .clips {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
-  align-items: start;
 }
 
+@media (max-width: 900px) {
+  .clips {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .clips {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Every clip sits in the same 16:9 frame so the grid stays even. */
 .clip-video {
   display: block;
   width: 100%;
@@ -307,13 +319,6 @@ section[id] {
   object-fit: cover;
   background: var(--color-ink);
   border: 1px solid var(--rule);
-}
-
-/* Vertical reels keep their 9:16 frame instead of being cropped. */
-.clip-video--portrait {
-  aspect-ratio: 9 / 16;
-  max-height: 78vh;
-  object-fit: contain;
 }
 
 .clip-empty {

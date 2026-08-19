@@ -56,18 +56,17 @@ export default async function ProjectPage({ params }: { params: Params }) {
 
           <p className="nda">{nda.project}</p>
 
-          <p className="section-label clips-label">Selected clips — sound on</p>
+          <p className="section-label clips-label">Selected clips</p>
           <div className="clips">
             {clips.length > 0
               ? clips.map((clip) => (
                   <figure key={clip.file} className="m-0">
                     <video
-                      className={
-                        clip.portrait ? 'clip-video clip-video--portrait' : 'clip-video'
-                      }
+                      className="clip-video"
                       src={`/projects/${project.slug}/${clip.file}.mp4`}
                       poster={`/projects/${project.slug}/${clip.file}.jpg`}
                       controls
+                      muted
                       playsInline
                       preload="metadata"
                     />
