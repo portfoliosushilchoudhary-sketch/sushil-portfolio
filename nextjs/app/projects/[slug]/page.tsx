@@ -65,8 +65,9 @@ export default async function ProjectPage({ params }: { params: Params }) {
                       className="clip-video"
                       src={`/projects/${project.slug}/${clip.file}.mp4`}
                       poster={`/projects/${project.slug}/${clip.file}.jpg`}
-                      controls
+                      autoPlay
                       muted
+                      loop
                       playsInline
                       preload="metadata"
                     />
