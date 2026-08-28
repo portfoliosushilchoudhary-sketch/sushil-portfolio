@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import ClipVideo from '@/components/ClipVideo'
 import { nda, projectClips, site, work } from '@/lib/site'
 
 type Params = Promise<{ slug: string }>
@@ -59,23 +60,23 @@ export default async function ProjectPage({ params }: { params: Params }) {
           <p className="section-label clips-label">Selected clips</p>
           <div className="clips">
             {clips.length > 0
-              ? clips.map((clip) => (
-                  <figure key={clip.file} className="m-0">
-                    <video
-                      className="clip-video"
-                      src={`/projects/${project.slug}/${clip.file}.mp4`}
-                      poster={`/projects/${project.slug}/${clip.file}.jpg`}
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      preload="metadata"
-                    />
-                    <figcaption className="clip-cap">
-                      {project.title} — excerpt {clip.file}
-                    </figcaption>
-                  </figure>
-                ))
+              ? clips.map((clip) => {
+                  const src =
+                    clip.src ?? `/projects/${project.slug}/${clip.file}.mp4`
+                  const poster =
+                    clip.poster ??
+                    (clip.src
+                      ? undefined
+                      : `/projects/${project.slug}/${clip.file}.jpg`)
+                  return (
+                    <figure key={clip.file} className="m-0">
+                      <ClipVideo src={src} poster={poster} />
+                      <figcaption className="clip-cap">
+                        {project.title} — excerpt {clip.file}
+                      </figcaption>
+                    </figure>
+                  )
+                })
               : [1, 2, 3].map((n) => (
                   <figure key={n} className="m-0">
                     <div className="clip-empty">

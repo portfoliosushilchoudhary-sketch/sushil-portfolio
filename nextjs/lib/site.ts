@@ -140,7 +140,7 @@ export const work = [
 // Cleared excerpts per discipline. Files live in
 // public/projects/<slug>/<file>.mp4 (+ matching .jpg poster).
 // portrait: true renders a 9:16 tile for vertical reels.
-export type Clip = { file: string; portrait?: boolean }
+export type Clip = { file: string; portrait?: boolean; src?: string; poster?: string }
 
 export const projectClips: Record<string, Clip[]> = {
   'motion-graphics': [
@@ -155,6 +155,16 @@ export const projectClips: Record<string, Clip[]> = {
     { file: '01' },
     { file: '02' },
     { file: '03' },
+  ],
+  explainers: [
+    { file: '01', src: 'https://www.crabstudio.in/projects/motion/explainer-system.mp4' },
+  ],
+  'product-films': [
+    { file: '01', src: 'https://www.crabstudio.in/projects/motion/floral-product.mp4' },
+  ],
+  'title-design': [
+    { file: '01', src: 'https://www.crabstudio.in/projects/motion/type.mp4' },
+    { file: '02', src: 'https://www.crabstudio.in/projects/motion/logo-mark.mp4' },
   ],
 }
 
