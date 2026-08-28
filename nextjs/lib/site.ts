@@ -49,14 +49,6 @@ export const work = [
   },
   {
     num: "N'002",
-    slug: 'brand-films',
-    title: 'Brand Films',
-    disc: 'Story / Direction',
-    lead: "Films that carry a brand's voice — story-first pieces directed from script to final grade.",
-    body: 'A brand film has one job: make people feel something specific about a company. I direct these end to end — narrative structure, boards, shoot supervision or full animation, edit and sound.',
-  },
-  {
-    num: "N'003",
     slug: 'cinematic',
     title: 'Cinematic',
     disc: 'Camera / Colour',
@@ -64,23 +56,7 @@ export const work = [
     body: 'Virtual cinematography, simulated optics and a disciplined grade. These pieces borrow the grammar of film — blocking, coverage, contrast ratios — and apply it to motion design.',
   },
   {
-    num: "N'004",
-    slug: 'ai-films',
-    title: 'AI Films',
-    disc: 'Generative / Hybrid Workflow',
-    lead: 'Hybrid pipelines that pair generative tools with hands-on direction, compositing and grade.',
-    body: 'Generative models are a new camera, not a finished film. I use them inside a traditional pipeline — art direction up front, heavy curation, then compositing, retiming and grading to bring the output up to commercial standard.',
-  },
-  {
-    num: "N'005",
-    slug: 'commercials',
-    title: 'Commercials',
-    disc: 'Broadcast / Campaign',
-    lead: 'Broadcast and campaign spots — tight durations, hard deadlines, messages that land in seconds.',
-    body: 'Thirty seconds is a long time if every frame is working. Campaign work across broadcast and digital: concept, boards, animation and versioning for every placement a media plan demands.',
-  },
-  {
-    num: "N'006",
+    num: "N'003",
     slug: 'explainers',
     title: 'Explainers',
     disc: 'Product / Narrative',
@@ -88,15 +64,7 @@ export const work = [
     body: 'The craft here is compression — taking a dense product or process and finding the visual sentence that explains it. Script, voice, illustration and animation built as one system.',
   },
   {
-    num: "N'007",
-    slug: 'billboard-led',
-    title: 'Billboard & LED',
-    disc: 'Large Format / Loop',
-    lead: 'Large-format and LED work — seamless loops built for scale, distance and unusual canvases.',
-    body: 'Designing for a screen the size of a building changes everything: legibility at distance, loop points nobody can spot, pixel maps that are never 16:9. Work delivered for outdoor LED, retail walls and event screens.',
-  },
-  {
-    num: "N'008",
+    num: "N'004",
     slug: 'real-estate',
     title: 'Real Estate',
     disc: 'Property Films / Walkthrough',
@@ -104,7 +72,7 @@ export const work = [
     body: 'Architectural film work — walkthroughs, aerial-style reveals and lifestyle cutdowns that give a development atmosphere, not just square footage.',
   },
   {
-    num: "N'009",
+    num: "N'005",
     slug: 'social-reels',
     title: 'Social Reels',
     disc: 'Short Form / Vertical',
@@ -112,7 +80,7 @@ export const work = [
     body: 'Vertical is its own discipline. These pieces are cut for sound-off first viewing, built around a hook in the opening beat, and designed to survive compression and a thumb mid-scroll.',
   },
   {
-    num: "N'010",
+    num: "N'006",
     slug: 'product-films',
     title: 'Product Films',
     disc: 'Launch / UI Motion',
@@ -120,20 +88,12 @@ export const work = [
     body: 'Product work rewards restraint: clean staging, honest materials, interface motion that mirrors how the real product feels. Launch films, feature explainers and store assets.',
   },
   {
-    num: "N'011",
+    num: "N'007",
     slug: 'title-design',
     title: 'Title Design',
     disc: 'Kinetic Typography',
     lead: 'Kinetic typography and title sequences — type as the lead performer.',
     body: 'Titles set the contract with the audience. Kinetic type pieces, opening sequences and typographic idents where letterforms carry rhythm, tone and story on their own.',
-  },
-  {
-    num: "N'012",
-    slug: 'showreel',
-    title: 'Showreel',
-    disc: 'Selected Work / 2026',
-    lead: 'Selected work, cut together — a fast pass through the last stretch of projects.',
-    body: 'A single cut of the strongest recent work across disciplines. Updated as new projects clear for release.',
   },
 ]
 
@@ -165,6 +125,44 @@ export const projectClips: Record<string, Clip[]> = {
   'title-design': [
     { file: '01', src: 'https://www.crabstudio.in/projects/motion/type.mp4' },
     { file: '02', src: 'https://www.crabstudio.in/projects/motion/logo-mark.mp4' },
+  ],
+}
+
+// Still-image galleries for disciplines whose work is photographic/design-led.
+export type Shot = { src: string; cap?: string }
+
+export const projectImages: Record<string, Shot[]> = {
+  'real-estate': [
+    {
+      src: 'https://www.crabstudio.in/projects/artha-developers/investment-hero.png',
+      cap: 'Artha Developers — premium residences campaign',
+    },
+  ],
+  'social-reels': [
+    {
+      src: 'https://www.crabstudio.in/projects/social-media/midori-campaign-grid.png',
+      cap: 'Midori Matcha — campaign grid',
+    },
+    {
+      src: 'https://www.crabstudio.in/projects/social-media/lumora-content-grid.webp',
+      cap: 'Lumora — content system',
+    },
+    {
+      src: 'https://www.crabstudio.in/projects/social-media/soleva-campaign-grid.png',
+      cap: 'Soleva — campaign storyboard',
+    },
+    {
+      src: 'https://www.crabstudio.in/projects/social-media/fashion-content-grid.webp',
+      cap: 'Editorial fashion — content grid',
+    },
+    {
+      src: 'https://www.crabstudio.in/projects/social-media/travel-content-grid.webp',
+      cap: 'Travel — content grid',
+    },
+    {
+      src: 'https://www.crabstudio.in/projects/social-media/soleva-board.jpg',
+      cap: 'Soleva — planning board',
+    },
   ],
 }
 

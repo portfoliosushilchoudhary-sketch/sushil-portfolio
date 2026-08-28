@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import ClipVideo from '@/components/ClipVideo'
-import { nda, projectClips, site, work } from '@/lib/site'
+import { nda, projectClips, projectImages, site, work } from '@/lib/site'
 
 type Params = Promise<{ slug: string }>
 
@@ -32,6 +32,7 @@ export default async function ProjectPage({ params }: { params: Params }) {
   if (!project) notFound()
 
   const clips = projectClips[project.slug] ?? []
+  const images = projectImages[project.slug] ?? []
 
   return (
     <>
@@ -57,7 +58,11 @@ export default async function ProjectPage({ params }: { params: Params }) {
 
           <p className="nda">{nda.project}</p>
 
-          <p className="section-label clips-label">Selected clips</p>
+          <p className="section-label clips-label">
+            {images.length > 0 && clips.length === 0
+              ? 'Selected work'
+              : 'Selected clips'}
+          </p>
           <div className="clips">
             {clips.length > 0
               ? clips.map((clip) => {
@@ -77,19 +82,34 @@ export default async function ProjectPage({ params }: { params: Params }) {
                     </figure>
                   )
                 })
-              : [1, 2, 3].map((n) => (
-                  <figure key={n} className="m-0">
-                    <div className="clip-empty">
-                      <span className="clip-tag">
-                        {project.num} / Clip 0{n}
-                      </span>
-                      <span className="clip-note">Video coming soon</span>
-                    </div>
-                    <figcaption className="clip-cap">
-                      {project.title} — excerpt 0{n}
-                    </figcaption>
-                  </figure>
-                ))}
+              : images.length > 0
+                ? images.map((shot, i) => (
+                    <figure key={shot.src} className="m-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        className="clip-video"
+                        src={shot.src}
+                        alt={shot.cap ?? `${project.title} — ${i + 1}`}
+                        loading="lazy"
+                      />
+                      <figcaption className="clip-cap">
+                        {shot.cap ?? `${project.title} — 0${i + 1}`}
+                      </figcaption>
+                    </figure>
+                  ))
+                : [1, 2, 3].map((n) => (
+                    <figure key={n} className="m-0">
+                      <div className="clip-empty">
+                        <span className="clip-tag">
+                          {project.num} / Clip 0{n}
+                        </span>
+                        <span className="clip-note">Video coming soon</span>
+                      </div>
+                      <figcaption className="clip-cap">
+                        {project.title} — excerpt 0{n}
+                      </figcaption>
+                    </figure>
+                  ))}
           </div>
         </div>
       </main>
