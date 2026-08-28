@@ -151,6 +151,11 @@ export const projectClips: Record<string, Clip[]> = {
     { file: '05' },
     { file: '06' },
   ],
+  cinematic: [
+    { file: '01' },
+    { file: '02' },
+    { file: '03' },
+  ],
 }
 
 export const profile = {
